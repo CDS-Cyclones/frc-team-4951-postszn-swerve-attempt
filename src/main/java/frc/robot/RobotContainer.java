@@ -122,6 +122,17 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
+
+    // Drive in half-speed when left bumper is held
+    controller
+        .leftBumper()
+        .whileTrue(
+            DriveCommands.joystickDrive(
+                drive, 
+                () -> controller.getLeftY() * 0.5,
+                () -> controller.getLeftX() * 0.5,
+                () -> controller.getRightX() * 0.5)
+        );
     // Lock to 0° when A button is held
     controller
         .a()
