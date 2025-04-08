@@ -77,10 +77,10 @@ public class DriveConstants {
   public static final double driveKd = 0.0;
   public static final double driveKs = 0.18406757595208734;
   public static final double driveKv = 0.09511381538864068;
-  public static final double driveSimP = 0.05;
+  public static final double driveSimP = 5.00;
   public static final double driveSimD = 0.0;
-  public static final double driveSimKs = 0.0;
-  public static final double driveSimKv = 0.0789;
+  public static final double driveSimKs = 0.04038;
+  public static final double driveSimKv = 0.11972;
 
   // Turn motor configuration
   public static final boolean turnInverted = false;

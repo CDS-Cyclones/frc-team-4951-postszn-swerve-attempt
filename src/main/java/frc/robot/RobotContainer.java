@@ -108,6 +108,7 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption("Just drive lol", DriveCommands.driveForward(drive));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -151,7 +152,6 @@ public class RobotContainer {
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0° when B button is pressed
-    // Reset gyro / odometry
     final Runnable resetGyro =
         Constants.currentMode == Constants.Mode.SIM
             ? () ->
@@ -176,7 +176,7 @@ public class RobotContainer {
 
   public void resetSimulationField() {
     if (Constants.currentMode != Constants.Mode.SIM) return;
-
+    drive.
     driveSimulation.setSimulationWorldPose(new Pose2d(3, 3, new Rotation2d()));
     SimulatedArena.getInstance().resetFieldForAuto();
   }
