@@ -13,12 +13,17 @@
 
 package frc.robot.subsystems.drive;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 
 public class DriveConstants {
   public static final double maxSpeedMetersPerSec = 4.8;
@@ -72,10 +77,10 @@ public class DriveConstants {
   public static final double driveKd = 0.0;
   public static final double driveKs = 0.18406757595208734;
   public static final double driveKv = 0.09511381538864068;
-  public static final double driveSimP = 0.05;
+  public static final double driveSimP = 5.00;
   public static final double driveSimD = 0.0;
-  public static final double driveSimKs = 0.0;
-  public static final double driveSimKv = 0.0789;
+  public static final double driveSimKs = 0.04038;
+  public static final double driveSimKv = 0.11972;
 
   // Turn motor configuration
   public static final boolean turnInverted = false;
@@ -112,4 +117,22 @@ public class DriveConstants {
               driveMotorCurrentLimit,
               1),
           moduleTranslations);
+
+  // Maple-SIM configuration
+  public static final DriveTrainSimulationConfig mapleSimConfig =
+      DriveTrainSimulationConfig.Default()
+          .withCustomModuleTranslations(moduleTranslations)
+          .withRobotMass(Kilogram.of(robotMassKg))
+          .withGyro(COTS.ofPigeon2())
+          .withSwerveModule(
+              new SwerveModuleSimulationConfig(
+                  driveGearbox,
+                  turnGearbox,
+                  driveMotorReduction,
+                  turnMotorReduction,
+                  Volts.of(0.1),
+                  Volts.of(0.1),
+                  Meters.of(wheelRadiusMeters),
+                  KilogramSquareMeters.of(0.02),
+                  wheelCOF));
 }

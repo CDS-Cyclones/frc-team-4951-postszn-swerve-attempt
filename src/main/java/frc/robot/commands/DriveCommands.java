@@ -63,6 +63,21 @@ public class DriveCommands {
         .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
         .getTranslation();
   }
+  /** Drive forward command. */
+  public static Command driveForward(Drive drive) {
+    return Commands.run(
+        () -> {
+          // Set constant linear velocity of 2 m/s forward
+          ChassisSpeeds speeds =
+              new ChassisSpeeds(
+                  2.0, // 2 m/s forward
+                  0.0, 0.0);
+
+          // Send the command to the drive subsystem
+          drive.runVelocity(speeds);
+        },
+        drive);
+  }
 
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
