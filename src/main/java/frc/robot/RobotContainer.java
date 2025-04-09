@@ -159,12 +159,12 @@ public class RobotContainer {
     final Runnable resetGyro =
         Constants.currentMode == Constants.Mode.SIM
             ? () ->
-                drive.setPose(
+                drive.resetOdometry(
                     driveSimulation
                         .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during
             // simulation
             : () ->
-                drive.setPose(
+                drive.resetOdometry(
                     new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
     controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
   }
