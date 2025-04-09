@@ -1,8 +1,10 @@
-package frc.robot.subsystems.drive;
+package frc.robot.subsystems.drive.simulation;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIO.GyroIOInputs;
 import frc.robot.util.SparkUtil;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 
