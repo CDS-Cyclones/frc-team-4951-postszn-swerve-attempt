@@ -82,12 +82,12 @@ public class RobotContainer {
                 new ModuleIOSim(driveSimulation.getModules()[2]),
                 new ModuleIOSim(driveSimulation.getModules()[3]),
                 driveSimulation::setSimulationWorldPose);
-            new Vision(
-                drive,
-                new VisionIOPhotonVisionSim(
-                    "camera",
-                    VisionConstants.botToCamTransformSim,
-                    driveSimulation::getSimulatedDriveTrainPose));
+        new Vision(
+            drive,
+            new VisionIOPhotonVisionSim(
+                "camera",
+                VisionConstants.botToCamTransformSim,
+                driveSimulation::getSimulatedDriveTrainPose));
         break;
 
       default:
