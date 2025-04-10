@@ -45,8 +45,6 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private SwerveDriveSimulation driveSimulation = null;
-  private Vision vision;
-
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
@@ -84,7 +82,6 @@ public class RobotContainer {
                 new ModuleIOSim(driveSimulation.getModules()[2]),
                 new ModuleIOSim(driveSimulation.getModules()[3]),
                 driveSimulation::setSimulationWorldPose);
-        vision =
             new Vision(
                 drive,
                 new VisionIOPhotonVisionSim(
