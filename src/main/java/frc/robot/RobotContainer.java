@@ -45,6 +45,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private SwerveDriveSimulation driveSimulation = null;
+  private Vision vision;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -83,6 +84,13 @@ public class RobotContainer {
                 new ModuleIOSim(driveSimulation.getModules()[2]),
                 new ModuleIOSim(driveSimulation.getModules()[3]),
                 driveSimulation::setSimulationWorldPose);
+        vision =
+            new Vision(
+                drive,
+                new VisionIOPhotonVisionSim(
+                    "camera",
+                    VisionConstants.botToCamTransformSim,
+                    driveSimulation::getSimulatedDriveTrainPose));
         break;
 
       default:
@@ -183,7 +191,7 @@ public class RobotContainer {
 
   public void resetSimulationField() {
     if (Constants.currentMode != Constants.Mode.SIM) return;
-    drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()));
+    drive.resetOdometry(new Pose2d(3, 3, new Rotation2d()));
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 

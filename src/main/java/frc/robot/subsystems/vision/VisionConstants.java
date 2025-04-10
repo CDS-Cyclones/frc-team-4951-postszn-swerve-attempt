@@ -17,6 +17,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 public class VisionConstants {
   // AprilTag layout
@@ -37,6 +38,12 @@ public class VisionConstants {
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
   public static double maxZError = 0.75;
+
+  public static Transform3d botToCamTransformSim =
+      new Transform3d(
+          new Translation3d(-.3, 0, 0), // X is forward in m, z is up in m
+          new Rotation3d(0, 0, 0) // facing forward
+          );
 
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)
