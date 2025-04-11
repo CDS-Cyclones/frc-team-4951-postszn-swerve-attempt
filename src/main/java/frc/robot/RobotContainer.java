@@ -27,6 +27,9 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.drive.simulation.GyroIOSim;
 import frc.robot.subsystems.drive.simulation.ModuleIOSim;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -42,7 +45,6 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private SwerveDriveSimulation driveSimulation = null;
-
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
@@ -80,6 +82,12 @@ public class RobotContainer {
                 new ModuleIOSim(driveSimulation.getModules()[2]),
                 new ModuleIOSim(driveSimulation.getModules()[3]),
                 driveSimulation::setSimulationWorldPose);
+        new Vision(
+            drive,
+            new VisionIOPhotonVisionSim(
+                "camera",
+                VisionConstants.botToCamTransformSim,
+                driveSimulation::getSimulatedDriveTrainPose));
         break;
 
       default:
@@ -180,7 +188,7 @@ public class RobotContainer {
 
   public void resetSimulationField() {
     if (Constants.currentMode != Constants.Mode.SIM) return;
-    drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()));
+    drive.resetOdometry(new Pose2d(3, 3, new Rotation2d()));
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
