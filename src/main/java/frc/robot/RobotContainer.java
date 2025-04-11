@@ -29,6 +29,7 @@ import frc.robot.subsystems.drive.simulation.GyroIOSim;
 import frc.robot.subsystems.drive.simulation.ModuleIOSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -64,6 +65,7 @@ public class RobotContainer {
                 new ModuleIOSpark(2),
                 new ModuleIOSpark(3),
                 (pose) -> {});
+        new Vision(drive, new VisionIOLimelight(VisionConstants.limeLightName, drive::getRotation));
         break;
 
       case SIM:
