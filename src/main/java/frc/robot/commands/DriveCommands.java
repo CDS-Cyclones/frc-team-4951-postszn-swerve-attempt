@@ -14,7 +14,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -22,7 +21,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -34,7 +32,6 @@ import frc.robot.Constants.FieldPose;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.vision.Vision;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -55,7 +52,6 @@ public class DriveCommands {
 
   private DriveCommands() {}
 
-
   /**
    * Drive to Field Pose determined by vision;
    *
@@ -65,86 +61,76 @@ public class DriveCommands {
    * @return Command
    */
 
-   //TODO: implement and test using smth like ts
-   /*
-    * when bumper pressed,
-    * DriveCommands.drivetoPOse(drive,vision,() -> FieldPose.A)????? (idk if this is correct)
-    */
+  // TODO: implement and test using smth like ts
+  /*
+   * when bumper pressed,
+   * DriveCommands.drivetoPOse(drive,vision,() -> FieldPose.A)????? (idk if this is correct)
+   */
   public static Command DriveToPose(
-    Drive drive,
-    Vision vision,
-    Supplier<FieldPose> desiredFieldPoseSupplier
-  ) {
+      Drive drive, Vision vision, Supplier<FieldPose> desiredFieldPoseSupplier) {
     return new FunctionalCommand(
-      () -> {
-        DriveConstants.angleController.enableContinuousInput(-Math.PI, Math.PI);
-        DriveConstants.angleController.reset();
-        DriveConstants.translationXController.reset();
-        DriveConstants.translationYController.reset();
-      },
-      () -> {
-        boolean isFlipped = DriverStation.getAlliance().isPresent()
-          && DriverStation.getAlliance().get() == Alliance.Red;
-  
-        Pose3d pose = desiredFieldPoseSupplier.get().getDesiredPose();
-  
-        double omega = DriveConstants.angleController.calculate(
-          drive.getRotation().getRadians(),
-          desiredFieldPoseSupplier.get().getDesiredRotation2d().getRadians()
-        );
-        double velocityX = DriveConstants.translationXController.calculate(
-          drive.getPose().getTranslation().getX(),
-          pose.getTranslation().getX()
-        );
-        double velocityY = DriveConstants.translationYController.calculate(
-          drive.getPose().getTranslation().getY(),
-          pose.getTranslation().getY()
-        );
-  
-        velocityX = MathUtil.applyDeadband(velocityX, 0.00);
-        velocityY = MathUtil.applyDeadband(velocityY, 0.00);
-        omega = MathUtil.applyDeadband(omega, 0.00);
-  
-        // Corrected clamp bounds
-        velocityX = MathUtil.clamp(
-          velocityX,
-          -DriveConstants.translationXPIDCMaxSpeed,
-          DriveConstants.translationXPIDCMaxSpeed
-        );
-        velocityY = MathUtil.clamp(
-          velocityY,
-          -DriveConstants.translationYPIDCMaxSpeed,
-          DriveConstants.translationYPIDCMaxSpeed
-        );
-        omega = MathUtil.clamp(
-          omega,
-          -DriveConstants.anglePIDCMaxSpeed,
-          DriveConstants.anglePIDCMaxSpeed
-        );
-  
-        ChassisSpeeds speeds = new ChassisSpeeds(
-          isFlipped ? -velocityX : velocityX,
-          isFlipped ? -velocityY : velocityY,
-          omega
-        );
-  
-        drive.runVelocity(
-          ChassisSpeeds.fromFieldRelativeSpeeds(
-            speeds,
-            isFlipped
-              ? drive.getRotation().plus(new Rotation2d(Math.PI))
-              : drive.getRotation()
-          )
-        );
-      },
-      interrupted -> drive.stopWithX(),
-      () -> DriveConstants.angleController.atSetpoint()
-            && DriveConstants.translationXController.atSetpoint()
-            && DriveConstants.translationYController.atSetpoint(),
-      drive, vision
-    );
+        () -> {
+          DriveConstants.angleController.enableContinuousInput(-Math.PI, Math.PI);
+          DriveConstants.angleController.reset();
+          DriveConstants.translationXController.reset();
+          DriveConstants.translationYController.reset();
+        },
+        () -> {
+          boolean isFlipped =
+              DriverStation.getAlliance().isPresent()
+                  && DriverStation.getAlliance().get() == Alliance.Red;
+
+          Pose3d pose = desiredFieldPoseSupplier.get().getDesiredPose();
+
+          double omega =
+              DriveConstants.angleController.calculate(
+                  drive.getRotation().getRadians(),
+                  desiredFieldPoseSupplier.get().getDesiredRotation2d().getRadians());
+          double velocityX =
+              DriveConstants.translationXController.calculate(
+                  drive.getPose().getTranslation().getX(), pose.getTranslation().getX());
+          double velocityY =
+              DriveConstants.translationYController.calculate(
+                  drive.getPose().getTranslation().getY(), pose.getTranslation().getY());
+
+          velocityX = MathUtil.applyDeadband(velocityX, 0.00);
+          velocityY = MathUtil.applyDeadband(velocityY, 0.00);
+          omega = MathUtil.applyDeadband(omega, 0.00);
+
+          // Corrected clamp bounds
+          velocityX =
+              MathUtil.clamp(
+                  velocityX,
+                  -DriveConstants.translationXPIDCMaxSpeed,
+                  DriveConstants.translationXPIDCMaxSpeed);
+          velocityY =
+              MathUtil.clamp(
+                  velocityY,
+                  -DriveConstants.translationYPIDCMaxSpeed,
+                  DriveConstants.translationYPIDCMaxSpeed);
+          omega =
+              MathUtil.clamp(
+                  omega, -DriveConstants.anglePIDCMaxSpeed, DriveConstants.anglePIDCMaxSpeed);
+
+          ChassisSpeeds speeds =
+              new ChassisSpeeds(
+                  isFlipped ? -velocityX : velocityX, isFlipped ? -velocityY : velocityY, omega);
+
+          drive.runVelocity(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  speeds,
+                  isFlipped
+                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                      : drive.getRotation()));
+        },
+        interrupted -> drive.stopWithX(),
+        () ->
+            DriveConstants.angleController.atSetpoint()
+                && DriveConstants.translationXController.atSetpoint()
+                && DriveConstants.translationYController.atSetpoint(),
+        drive,
+        vision);
   }
-  
 
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     // Apply deadband
@@ -220,40 +206,40 @@ public class DriveCommands {
    * absolute rotation with a joystick.
    */
   public static Command joystickDriveAtAngle(
-    Drive drive,
-    DoubleSupplier xSupplier,
-    DoubleSupplier ySupplier,
-    Supplier<Rotation2d> rotationSupplier) {
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Supplier<Rotation2d> rotationSupplier) {
 
-  return Commands.run(
-          () -> {
-            // Get linear velocity
-            Translation2d linearVelocity =
-                getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-            // Use the angle controller from DriveConstants
-            double omega =
-                DriveConstants.angleController.calculate(
-                    drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
-            // Convert to field relative speeds & send command
-            ChassisSpeeds speeds =
-                new ChassisSpeeds(
-                    linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                    linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                    omega);
-            boolean isFlipped =
-                DriverStation.getAlliance().isPresent()
-                    && DriverStation.getAlliance().get() == Alliance.Red;
-            drive.runVelocity(
-                ChassisSpeeds.fromFieldRelativeSpeeds(
-                    speeds,
-                    isFlipped
-                        ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                        : drive.getRotation()));
-          },
-          drive)
-      // Reset PID controller when command starts
-      .beforeStarting(() -> DriveConstants.angleController.reset());
-}
+    return Commands.run(
+            () -> {
+              // Get linear velocity
+              Translation2d linearVelocity =
+                  getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+              // Use the angle controller from DriveConstants
+              double omega =
+                  DriveConstants.angleController.calculate(
+                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+              // Convert to field relative speeds & send command
+              ChassisSpeeds speeds =
+                  new ChassisSpeeds(
+                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                      omega);
+              boolean isFlipped =
+                  DriverStation.getAlliance().isPresent()
+                      && DriverStation.getAlliance().get() == Alliance.Red;
+              drive.runVelocity(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      speeds,
+                      isFlipped
+                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                          : drive.getRotation()));
+            },
+            drive)
+        // Reset PID controller when command starts
+        .beforeStarting(() -> DriveConstants.angleController.reset());
+  }
 
   /**
    * Measures the velocity feedforward constants for the drive motors.

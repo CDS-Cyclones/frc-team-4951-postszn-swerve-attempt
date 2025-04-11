@@ -17,6 +17,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -99,6 +100,38 @@ public class DriveConstants {
   public static final double turnSimD = 0.2;
   public static final double turnPIDMinInput = 0; // Radians
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
+
+  public static final double ANGLE_KP = 5.0;
+  public static final double ANGLE_KD = 0.4;
+  public static final double ANGLE_MAX_VELOCITY = 8.0;
+  public static final double ANGLE_MAX_ACCELERATION = 20.0;
+
+  // PID controllers
+  public static final double anglePIDCKp = 3.2;
+  public static final double anglePIDCKi = 0;
+  public static final double anglePIDCKd = 0;
+  public static final double anglePIDCTolerance = 0.02;
+  public static final double anglePIDCMaxSpeed = 6; // in radians per second
+
+  public static final double translationXPIDCKp = 3;
+  public static final double translationXPIDCKi = 0;
+  public static final double translationXPIDCKd = 0;
+  public static final double translationXPIDCTolerance = 0.05;
+  public static final double translationXPIDCMaxSpeed = 3; // in meters per second
+
+  public static final double translationYPIDCKp = 3;
+  public static final double translationYPIDCKi = 0;
+  public static final double translationYPIDCKd = 0;
+  public static final double translationYPIDCTolerance = 0.0;
+  public static final double translationYPIDCMaxSpeed = 3; // in meters per second
+
+  public static final PIDController angleController =
+      new PIDController(anglePIDCKp, anglePIDCKi, anglePIDCKd);
+
+  public static final PIDController translationXController =
+      new PIDController(translationXPIDCKp, translationXPIDCKi, translationXPIDCKd);
+  public static final PIDController translationYController =
+      new PIDController(translationYPIDCKp, translationYPIDCKi, translationYPIDCKd);
 
   // PathPlanner configuration
   public static final double robotMassKg = 59.0531907;

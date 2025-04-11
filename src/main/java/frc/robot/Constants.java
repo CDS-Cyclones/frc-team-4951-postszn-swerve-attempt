@@ -95,7 +95,7 @@ public final class Constants {
     }
 
     public Pose3d getDesiredPose(
-      boolean ignoreForwards, boolean ignoreSideways, boolean ignoreRotation) {
+        boolean ignoreForwards, boolean ignoreSideways, boolean ignoreRotation) {
       Pose3d tagPose = getTagPose();
       double tagAngle = tagPose.getRotation().toRotation2d().getRadians();
       double tagX = tagPose.getTranslation().getX();
