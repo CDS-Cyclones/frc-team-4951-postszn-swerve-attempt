@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.FieldPose;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -381,5 +382,28 @@ public class DriveCommands {
     double[] positions = new double[4];
     Rotation2d lastAngle = new Rotation2d();
     double gyroDelta = 0.0;
+  }
+
+  public static Command driveToPoseIfClose(
+      Drive drive, Vision vision, Supplier<FieldPose> targetSupplier, double threshold) {
+    return new InstantCommand(
+        () -> {
+          Pose2d targetPose = targetSupplier.get().getDesiredPose().toPose2d();
+          Pose2d currentPose = drive.getPose();
+          double distance = currentPose.getTranslation().getDistance(targetPose.getTranslation());
+          if (distance < threshold) {
+            System.out.println(
+                "OP Board button pressed: Within "
+                    + threshold
+                    + " m. Driving to "
+                    + targetSupplier.get());
+            // Schedule the DriveToPose command
+            DriveCommands.DriveToPose(drive, vision, targetSupplier).schedule();
+          } else {
+            System.out.println(
+                "OP Board button pressed: NOT within " + threshold + " m (" + distance + " m)");
+          }
+        },
+        drive);
   }
 }

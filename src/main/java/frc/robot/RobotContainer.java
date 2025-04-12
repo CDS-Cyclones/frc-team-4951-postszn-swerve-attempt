@@ -172,9 +172,9 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Drive in half-speed when left bumper is held
+    // Drive in half-speed when right bumper is held
     controller
-        .leftBumper()
+        .rightBumper()
         .whileTrue(
             DriveCommands.joystickDrive(
                 drive,
@@ -215,221 +215,112 @@ public class RobotContainer {
         // ************************************************************************************************************************.
       case SIM:
         // Button 1 -> FieldPose.A
-        new JoystickButton(m_operatorBoard, 1)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 1))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.A.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 1 pressed: Within 1.5 m. Driving to FieldPose.A");
-                        DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.A).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 1 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.A, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 2 -> FieldPose.B
-        new JoystickButton(m_operatorBoard, 2)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 2))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.B.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 2 pressed: Within 1.5 m. Driving to FieldPose.B");
-                        DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.B).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 2 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.B, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 3 -> FieldPose.C
-        new JoystickButton(m_operatorBoard, 3)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 3))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.C.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 3 pressed: Within 1.5 m. Driving to FieldPose.C");
-                        DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.C).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 3 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.C, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 4 -> FieldPose.D
-        new JoystickButton(m_operatorBoard, 4)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 4))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.D.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 4 pressed: Within 1.5 m. Driving to FieldPose.D");
-                        DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.D).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 4 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.D, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 5 -> FieldPose.E
-        new JoystickButton(m_operatorBoard, 5)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 5))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.E.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 5 pressed: Within 1.5 m. Driving to FieldPose.E");
-                        DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.E).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 5 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.E, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 6 -> FieldPose.F
-        new JoystickButton(m_operatorBoard, 6)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 6))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.F.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 6 pressed: Within 1.5 m. Driving to FieldPose.F");
-                        DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.F).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 6 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.F, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 7 -> FieldPose.G
-        new JoystickButton(m_operatorBoard, 7)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 7))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.G.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 7 pressed: Within 1.5 m. Driving to FieldPose.G");
-                        DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.G).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 7 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.G, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 8 -> FieldPose.H
-        new JoystickButton(m_operatorBoard, 8)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 8))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.H.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 8 pressed: Within 1.5 m. Driving to FieldPose.H");
-                        DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.H).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 8 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.H, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 9 -> FieldPose.I
-        new JoystickButton(m_operatorBoard, 9)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 9))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.I.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 9 pressed: Within 1.5 m. Driving to FieldPose.I");
-                        DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.I).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 9 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.I, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 10 -> FieldPose.J
-        new JoystickButton(m_operatorBoard, 10)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 10))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.J.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 10 pressed: Within 1.5 m. Driving to FieldPose.J");
-                        DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.J).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 10 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.J, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 11 -> FieldPose.K
-        new JoystickButton(m_operatorBoard, 11)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 11))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.K.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 11 pressed: Within 1.5 m. Driving to FieldPose.K");
-                        DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.K).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 11 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.K, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 12 -> FieldPose.L
-        new JoystickButton(m_operatorBoard, 12)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 12))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.L.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 12 pressed: Within 1.5 m. Driving to FieldPose.L");
-                        DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.L).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 12 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.L, DriveConstants.DriveToPoseThreshold));
+        ;
         break;
 
         // ************************************************************************************************************************
@@ -439,221 +330,112 @@ public class RobotContainer {
         // ************************************************************************************************************************
       case REAL:
         // Button 1 -> FieldPose.A
-        new JoystickButton(m_operatorBoard, 1)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 1))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.A.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 1 pressed: Within 1.5 m. Driving to FieldPose.A");
-                        DriveCommands.DriveToPose(drive, vision, () -> FieldPose.A).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 1 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.A, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 2 -> FieldPose.B
-        new JoystickButton(m_operatorBoard, 2)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 2))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.B.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 2 pressed: Within 1.5 m. Driving to FieldPose.B");
-                        DriveCommands.DriveToPose(drive, vision, () -> FieldPose.B).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 2 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.B, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 3 -> FieldPose.C
-        new JoystickButton(m_operatorBoard, 3)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 3))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.C.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 3 pressed: Within 1.5 m. Driving to FieldPose.C");
-                        DriveCommands.DriveToPose(drive, vision, () -> FieldPose.C).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 3 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.C, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 4 -> FieldPose.D
-        new JoystickButton(m_operatorBoard, 4)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 4))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.D.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 4 pressed: Within 1.5 m. Driving to FieldPose.D");
-                        DriveCommands.DriveToPose(drive, vision, () -> FieldPose.D).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 4 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.D, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 5 -> FieldPose.E
-        new JoystickButton(m_operatorBoard, 5)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 5))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.E.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 5 pressed: Within 1.5 m. Driving to FieldPose.E");
-                        DriveCommands.DriveToPose(drive, vision, () -> FieldPose.E).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 5 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.E, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 6 -> FieldPose.F
-        new JoystickButton(m_operatorBoard, 6)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 6))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.F.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 6 pressed: Within 1.5 m. Driving to FieldPose.F");
-                        DriveCommands.DriveToPose(drive, vision, () -> FieldPose.F).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 6 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.F, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 7 -> FieldPose.G
-        new JoystickButton(m_operatorBoard, 7)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 7))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.G.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 7 pressed: Within 1.5 m. Driving to FieldPose.G");
-                        DriveCommands.DriveToPose(drive, vision, () -> FieldPose.G).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 7 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.G, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 8 -> FieldPose.H
-        new JoystickButton(m_operatorBoard, 8)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 8))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.H.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 8 pressed: Within 1.5 m. Driving to FieldPose.H");
-                        DriveCommands.DriveToPose(drive, vision, () -> FieldPose.H).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 8 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.H, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 9 -> FieldPose.I
-        new JoystickButton(m_operatorBoard, 9)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 9))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.I.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 9 pressed: Within 1.5 m. Driving to FieldPose.I");
-                        DriveCommands.DriveToPose(drive, vision, () -> FieldPose.I).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 9 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.I, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 10 -> FieldPose.J
-        new JoystickButton(m_operatorBoard, 10)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 10))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.J.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 10 pressed: Within 1.5 m. Driving to FieldPose.J");
-                        DriveCommands.DriveToPose(drive, vision, () -> FieldPose.J).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 10 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.J, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 11 -> FieldPose.K
-        new JoystickButton(m_operatorBoard, 11)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 11))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.K.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 11 pressed: Within 1.5 m. Driving to FieldPose.K");
-                        DriveCommands.DriveToPose(drive, vision, () -> FieldPose.K).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 11 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.K, DriveConstants.DriveToPoseThreshold));
+        ;
+
         // Button 12 -> FieldPose.L
-        new JoystickButton(m_operatorBoard, 12)
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 12))
             .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      Pose2d targetPose = FieldPose.L.getDesiredPose().toPose2d();
-                      Pose2d currentPose = drive.getPose();
-                      double distance =
-                          currentPose.getTranslation().getDistance(targetPose.getTranslation());
-                      if (distance < 1.5) {
-                        System.out.println(
-                            "OP Board button 12 pressed: Within 1.5 m. Driving to FieldPose.L");
-                        DriveCommands.DriveToPose(drive, vision, () -> FieldPose.L).schedule();
-                      } else {
-                        System.out.println(
-                            "OP Board button 12 pressed: NOT within 1.5 m (" + distance + " m)");
-                      }
-                    }));
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.L, DriveConstants.DriveToPoseThreshold));
+        ;
         break;
     }
   }
