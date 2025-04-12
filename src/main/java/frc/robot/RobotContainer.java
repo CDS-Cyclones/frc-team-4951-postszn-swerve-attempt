@@ -22,7 +22,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.FieldPose;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.drive.simulation.GyroIOSim;
@@ -48,7 +50,9 @@ public class RobotContainer {
   private SwerveDriveSimulation driveSimulation = null;
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
-
+  public final GenericHID m_operatorBoard = new GenericHID(1);
+  private final Vision visionSim;
+  private final Vision vision;
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -65,7 +69,10 @@ public class RobotContainer {
                 new ModuleIOSpark(2),
                 new ModuleIOSpark(3),
                 (pose) -> {});
-        new Vision(drive, new VisionIOLimelight(VisionConstants.limeLightName, drive::getRotation));
+        vision =
+            new Vision(
+                drive, new VisionIOLimelight(VisionConstants.limeLightName, drive::getRotation));
+        visionSim = new Vision(drive);
         break;
 
       case SIM:
@@ -84,12 +91,22 @@ public class RobotContainer {
                 new ModuleIOSim(driveSimulation.getModules()[2]),
                 new ModuleIOSim(driveSimulation.getModules()[3]),
                 driveSimulation::setSimulationWorldPose);
-        new Vision(
-            drive,
-            new VisionIOPhotonVisionSim(
-                "camera",
-                VisionConstants.botToCamTransformSim,
-                driveSimulation::getSimulatedDriveTrainPose));
+        // new Vision(
+        //     drive,
+        //     new VisionIOPhotonVisionSim(
+        //         "camera",
+        //         VisionConstants.botToCamTransformSim,
+        //         driveSimulation::getSimulatedDriveTrainPose));
+        visionSim =
+            new Vision(
+                drive,
+                new VisionIOPhotonVisionSim(
+                    "camera",
+                    VisionConstants.botToCamTransformSim,
+                    driveSimulation::getSimulatedDriveTrainPose));
+
+        vision = new Vision(drive);
+
         break;
 
       default:
@@ -102,6 +119,18 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 (pose) -> {});
+        visionSim =
+            new Vision(
+                drive,
+                new VisionIOPhotonVisionSim(
+                    "camera",
+                    VisionConstants.botToCamTransformSim,
+                    driveSimulation::getSimulatedDriveTrainPose));
+
+        vision =
+            new Vision(
+                drive, new VisionIOLimelight(VisionConstants.limeLightName, drive::getRotation));
+
         break;
     }
 
@@ -143,9 +172,9 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Drive in half-speed when left bumper is held
+    // Drive in half-speed when right bumper is held
     controller
-        .leftBumper()
+        .rightBumper()
         .whileTrue(
             DriveCommands.joystickDrive(
                 drive,
@@ -177,6 +206,238 @@ public class RobotContainer {
                 drive.resetOdometry(
                     new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
     controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+
+    switch (Constants.currentMode) {
+        // ************************************************************************************************************************
+        // ************************************************************************************************************************
+        //                                             Sim Robot
+        // ************************************************************************************************************************
+        // ************************************************************************************************************************.
+      case SIM:
+        // Button 1 -> FieldPose.A
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 1))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.A, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 2 -> FieldPose.B
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 2))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.B, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 3 -> FieldPose.C
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 3))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.C, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 4 -> FieldPose.D
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 4))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.D, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 5 -> FieldPose.E
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 5))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.E, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 6 -> FieldPose.F
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 6))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.F, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 7 -> FieldPose.G
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 7))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.G, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 8 -> FieldPose.H
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 8))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.H, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 9 -> FieldPose.I
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 9))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.I, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 10 -> FieldPose.J
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 10))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.J, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 11 -> FieldPose.K
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 11))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.K, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 12 -> FieldPose.L
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 12))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, visionSim, () -> FieldPose.L, DriveConstants.DriveToPoseThreshold));
+        ;
+        break;
+
+        // ************************************************************************************************************************
+        // ************************************************************************************************************************
+        //                                             REAL ROBOT
+        // ************************************************************************************************************************
+        // ************************************************************************************************************************
+      case REAL:
+        // Button 1 -> FieldPose.A
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 1))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.A, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 2 -> FieldPose.B
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 2))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.B, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 3 -> FieldPose.C
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 3))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.C, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 4 -> FieldPose.D
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 4))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.D, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 5 -> FieldPose.E
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 5))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.E, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 6 -> FieldPose.F
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 6))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.F, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 7 -> FieldPose.G
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 7))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.G, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 8 -> FieldPose.H
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 8))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.H, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 9 -> FieldPose.I
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 9))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.I, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 10 -> FieldPose.J
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 10))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.J, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 11 -> FieldPose.K
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 11))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.K, DriveConstants.DriveToPoseThreshold));
+        ;
+
+        // Button 12 -> FieldPose.L
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 12))
+            .onTrue(
+                DriveCommands.driveToPoseIfClose(
+                    drive, vision, () -> FieldPose.L, DriveConstants.DriveToPoseThreshold));
+        ;
+        break;
+    }
   }
 
   /**

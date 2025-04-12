@@ -14,22 +14,25 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.Constants.FieldPose;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.vision.Vision;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -38,17 +41,100 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class DriveCommands {
-  private static final double DEADBAND = 0.1;
+  private static final double DEADBAND = 0.2;
+
+  @SuppressWarnings("unused")
   private static final double ANGLE_KP = 5.0;
+
+  @SuppressWarnings("unused")
   private static final double ANGLE_KD = 0.4;
+
+  @SuppressWarnings("unused")
   private static final double ANGLE_MAX_VELOCITY = 8.0;
+
+  @SuppressWarnings("unused")
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
+
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
   private DriveCommands() {}
+
+  /**
+   * Drive to Field Pose determined by vision;
+   *
+   * @param drive
+   * @param vision
+   * @param desiredFieldPoseSupplier
+   * @return Command
+   */
+  public static Command DriveToPose(
+      Drive drive, Vision vision, Supplier<FieldPose> desiredFieldPoseSupplier) {
+    return new FunctionalCommand(
+        () -> {
+          DriveConstants.angleController.enableContinuousInput(-Math.PI, Math.PI);
+          DriveConstants.angleController.reset();
+          DriveConstants.translationXController.reset();
+          DriveConstants.translationYController.reset();
+        },
+        () -> {
+          boolean isFlipped =
+              DriverStation.getAlliance().isPresent()
+                  && DriverStation.getAlliance().get() == Alliance.Red;
+
+          Pose3d pose = desiredFieldPoseSupplier.get().getDesiredPose();
+
+          double omega =
+              DriveConstants.angleController.calculate(
+                  drive.getRotation().getRadians(),
+                  desiredFieldPoseSupplier.get().getDesiredRotation2d().getRadians());
+          double velocityX =
+              DriveConstants.translationXController.calculate(
+                  drive.getPose().getTranslation().getX(), pose.getTranslation().getX());
+          double velocityY =
+              DriveConstants.translationYController.calculate(
+                  drive.getPose().getTranslation().getY(), pose.getTranslation().getY());
+
+          velocityX = MathUtil.applyDeadband(velocityX, 0.00);
+          velocityY = MathUtil.applyDeadband(velocityY, 0.00);
+          omega = MathUtil.applyDeadband(omega, 0.00);
+
+          // Corrected clamp bounds
+          velocityX =
+              MathUtil.clamp(
+                  velocityX,
+                  -DriveConstants.translationXPIDCMaxSpeed,
+                  DriveConstants.translationXPIDCMaxSpeed);
+          velocityY =
+              MathUtil.clamp(
+                  velocityY,
+                  -DriveConstants.translationYPIDCMaxSpeed,
+                  DriveConstants.translationYPIDCMaxSpeed);
+          omega =
+              MathUtil.clamp(
+                  omega, -DriveConstants.anglePIDCMaxSpeed, DriveConstants.anglePIDCMaxSpeed);
+
+          ChassisSpeeds speeds =
+              new ChassisSpeeds(
+                  isFlipped ? -velocityX : velocityX, isFlipped ? -velocityY : velocityY, omega);
+
+          drive.runVelocity(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  speeds,
+                  isFlipped
+                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                      : drive.getRotation()));
+        },
+        interrupted -> drive.stopWithX(),
+        () ->
+            DriveConstants.angleController.atSetpoint()
+                && DriveConstants.translationXController.atSetpoint()
+                && DriveConstants.translationYController.atSetpoint(),
+        drive,
+        vision);
+  }
 
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     // Apply deadband
@@ -129,27 +215,15 @@ public class DriveCommands {
       DoubleSupplier ySupplier,
       Supplier<Rotation2d> rotationSupplier) {
 
-    // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            ANGLE_KP,
-            0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-
-    // Construct command
     return Commands.run(
             () -> {
               // Get linear velocity
               Translation2d linearVelocity =
                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-
-              // Calculate angular speed
+              // Use the angle controller from DriveConstants
               double omega =
-                  angleController.calculate(
+                  DriveConstants.angleController.calculate(
                       drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
-
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
                   new ChassisSpeeds(
@@ -167,9 +241,8 @@ public class DriveCommands {
                           : drive.getRotation()));
             },
             drive)
-
         // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+        .beforeStarting(() -> DriveConstants.angleController.reset());
   }
 
   /**
@@ -309,5 +382,28 @@ public class DriveCommands {
     double[] positions = new double[4];
     Rotation2d lastAngle = new Rotation2d();
     double gyroDelta = 0.0;
+  }
+
+  public static Command driveToPoseIfClose(
+      Drive drive, Vision vision, Supplier<FieldPose> targetSupplier, double threshold) {
+    return new InstantCommand(
+        () -> {
+          Pose2d targetPose = targetSupplier.get().getDesiredPose().toPose2d();
+          Pose2d currentPose = drive.getPose();
+          double distance = currentPose.getTranslation().getDistance(targetPose.getTranslation());
+          if (distance < threshold) {
+            System.out.println(
+                "OP Board button pressed: Within "
+                    + threshold
+                    + " m. Driving to "
+                    + targetSupplier.get());
+            // Schedule the DriveToPose command
+            DriveCommands.DriveToPose(drive, vision, targetSupplier).schedule();
+          } else {
+            System.out.println(
+                "OP Board button pressed: NOT within " + threshold + " m (" + distance + " m)");
+          }
+        },
+        drive);
   }
 }
