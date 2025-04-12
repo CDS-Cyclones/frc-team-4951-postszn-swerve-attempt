@@ -49,7 +49,7 @@ public class RobotContainer {
   private final Drive drive;
   private SwerveDriveSimulation driveSimulation = null;
   // Controller
-  public final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController controller = new CommandXboxController(0);
   public final GenericHID m_operatorBoard = new GenericHID(1);
   private final Vision visionSim;
   private final Vision vision;
@@ -58,7 +58,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -73,13 +72,7 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive, new VisionIOLimelight(VisionConstants.limeLightName, drive::getRotation));
-        visionSim =
-            new Vision(
-                drive,
-                new VisionIOPhotonVisionSim(
-                    "camera",
-                    VisionConstants.botToCamTransformSim,
-                    driveSimulation::getSimulatedDriveTrainPose));
+        visionSim = new Vision(drive);
         break;
 
       case SIM:
@@ -112,9 +105,8 @@ public class RobotContainer {
                     VisionConstants.botToCamTransformSim,
                     driveSimulation::getSimulatedDriveTrainPose));
 
-        vision =
-            new Vision(
-                drive, new VisionIOLimelight(VisionConstants.limeLightName, drive::getRotation));
+        vision = new Vision(drive);
+
         break;
 
       default:
@@ -138,6 +130,7 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive, new VisionIOLimelight(VisionConstants.limeLightName, drive::getRotation));
+
         break;
     }
 
@@ -179,9 +172,9 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Drive in half-speed when right bumper is held
+    // Drive in half-speed when left bumper is held
     controller
-        .rightBumper()
+        .leftBumper()
         .whileTrue(
             DriveCommands.joystickDrive(
                 drive,
@@ -214,168 +207,99 @@ public class RobotContainer {
                     new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
     controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
-    // OPBOARD
-
-    // ********************************************************************************************************
-    // ********************************************************************************************************
-    //                                      SIM ROBOT
-    // ********************************************************************************************************
-    // ********************************************************************************************************
     switch (Constants.currentMode) {
       case SIM:
-        new JoystickButton(m_operatorBoard, 1)
+        // Bind each op board button independently.
+        controller
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 1))
             .onTrue(
                 Commands.runOnce(
                     () -> {
+                      System.out.println("OP Board button 1 pressed: Driving to FieldPose.A");
                       DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.A).schedule();
                     }));
         new JoystickButton(m_operatorBoard, 2)
             .onTrue(
                 Commands.runOnce(
                     () -> {
+                      System.out.println("OP Board button 2 pressed: Driving to FieldPose.B");
                       DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.B).schedule();
                     }));
         new JoystickButton(m_operatorBoard, 3)
             .onTrue(
                 Commands.runOnce(
                     () -> {
+                      System.out.println("OP Board button 3 pressed: Driving to FieldPose.C");
                       DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.C).schedule();
                     }));
         new JoystickButton(m_operatorBoard, 4)
             .onTrue(
                 Commands.runOnce(
                     () -> {
+                      System.out.println("OP Board button 4 pressed: Driving to FieldPose.D");
                       DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.D).schedule();
                     }));
         new JoystickButton(m_operatorBoard, 5)
             .onTrue(
                 Commands.runOnce(
                     () -> {
+                      System.out.println("OP Board button 5 pressed: Driving to FieldPose.E");
                       DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.E).schedule();
                     }));
         new JoystickButton(m_operatorBoard, 6)
             .onTrue(
                 Commands.runOnce(
                     () -> {
+                      System.out.println("OP Board button 6 pressed: Driving to FieldPose.F");
                       DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.F).schedule();
                     }));
         new JoystickButton(m_operatorBoard, 7)
             .onTrue(
                 Commands.runOnce(
                     () -> {
+                      System.out.println("OP Board button 7 pressed: Driving to FieldPose.G");
                       DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.G).schedule();
                     }));
         new JoystickButton(m_operatorBoard, 8)
             .onTrue(
                 Commands.runOnce(
                     () -> {
+                      System.out.println("OP Board button 8 pressed: Driving to FieldPose.H");
                       DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.H).schedule();
                     }));
         new JoystickButton(m_operatorBoard, 9)
             .onTrue(
                 Commands.runOnce(
                     () -> {
+                      System.out.println("OP Board button 9 pressed: Driving to FieldPose.I");
                       DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.I).schedule();
                     }));
         new JoystickButton(m_operatorBoard, 10)
             .onTrue(
                 Commands.runOnce(
                     () -> {
+                      System.out.println("OP Board button 10 pressed: Driving to FieldPose.J");
                       DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.J).schedule();
                     }));
         new JoystickButton(m_operatorBoard, 11)
             .onTrue(
                 Commands.runOnce(
                     () -> {
+                      System.out.println("OP Board button 11 pressed: Driving to FieldPose.K");
                       DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.K).schedule();
                     }));
         new JoystickButton(m_operatorBoard, 12)
             .onTrue(
                 Commands.runOnce(
                     () -> {
+                      System.out.println("OP Board button 12 pressed: Driving to FieldPose.L");
                       DriveCommands.DriveToPose(drive, visionSim, () -> FieldPose.L).schedule();
                     }));
-
-        // ********************************************************************************************************
-        // ********************************************************************************************************
-        //                                      REAL ROBOT
-        // ********************************************************************************************************
-        // ********************************************************************************************************
-      case REAL:
-        new JoystickButton(m_operatorBoard, 1)
-            .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      DriveCommands.DriveToPose(drive, vision, () -> FieldPose.A).schedule();
-                    }));
-        new JoystickButton(m_operatorBoard, 2)
-            .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      DriveCommands.DriveToPose(drive, vision, () -> FieldPose.B).schedule();
-                    }));
-        new JoystickButton(m_operatorBoard, 3)
-            .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      DriveCommands.DriveToPose(drive, vision, () -> FieldPose.C).schedule();
-                    }));
-        new JoystickButton(m_operatorBoard, 4)
-            .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      DriveCommands.DriveToPose(drive, vision, () -> FieldPose.D).schedule();
-                    }));
-        new JoystickButton(m_operatorBoard, 5)
-            .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      DriveCommands.DriveToPose(drive, vision, () -> FieldPose.E).schedule();
-                    }));
-        new JoystickButton(m_operatorBoard, 6)
-            .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      DriveCommands.DriveToPose(drive, vision, () -> FieldPose.F).schedule();
-                    }));
-        new JoystickButton(m_operatorBoard, 7)
-            .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      DriveCommands.DriveToPose(drive, vision, () -> FieldPose.G).schedule();
-                    }));
-        new JoystickButton(m_operatorBoard, 8)
-            .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      DriveCommands.DriveToPose(drive, vision, () -> FieldPose.H).schedule();
-                    }));
-        new JoystickButton(m_operatorBoard, 9)
-            .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      DriveCommands.DriveToPose(drive, vision, () -> FieldPose.I).schedule();
-                    }));
-        new JoystickButton(m_operatorBoard, 10)
-            .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      DriveCommands.DriveToPose(drive, vision, () -> FieldPose.J).schedule();
-                    }));
-        new JoystickButton(m_operatorBoard, 11)
-            .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      DriveCommands.DriveToPose(drive, vision, () -> FieldPose.K).schedule();
-                    }));
-        new JoystickButton(m_operatorBoard, 12)
-            .onTrue(
-                Commands.runOnce(
-                    () -> {
-                      DriveCommands.DriveToPose(drive, vision, () -> FieldPose.L).schedule();
-                    }));
+        break;
     }
   }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -399,13 +323,5 @@ public class RobotContainer {
     Logger.recordOutput(
         "FieldSimulation/Notes",
         SimulatedArena.getInstance().getGamePiecesByType("Note").toArray(new Pose3d[0]));
-  }
-
-  public Drive getDrive() {
-    return drive;
-  }
-
-  public Vision getVision() {
-    return visionSim;
   }
 }
