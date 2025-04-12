@@ -41,10 +41,19 @@ import java.util.function.Supplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
+
+  @SuppressWarnings("unused")
   private static final double ANGLE_KP = 5.0;
+
+  @SuppressWarnings("unused")
   private static final double ANGLE_KD = 0.4;
+
+  @SuppressWarnings("unused")
   private static final double ANGLE_MAX_VELOCITY = 8.0;
+
+  @SuppressWarnings("unused")
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
+
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -59,12 +68,6 @@ public class DriveCommands {
    * @param vision
    * @param desiredFieldPoseSupplier
    * @return Command
-   */
-
-  // TODO: implement and test using smth like ts
-  /*
-   * when bumper pressed,
-   * DriveCommands.drivetoPOse(drive,vision,() -> FieldPose.A)????? (idk if this is correct)
    */
   public static Command DriveToPose(
       Drive drive, Vision vision, Supplier<FieldPose> desiredFieldPoseSupplier) {
