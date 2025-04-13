@@ -80,6 +80,7 @@ public final class Constants {
   public static final double pivotMaxSpeed = 0.18; // max speed going into the bot
   public static final double pivotMinSpeed = -0.17; // max speed leaving bot
   public static final double pivotPositionTolerance = 0.01;
+  public static final double pivotMinPositionToMoveElevator = 2;
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -90,6 +91,36 @@ public final class Constants {
 
     /** Replaying from a log file. */
     REPLAY
+  }
+
+  // Stolen enum from andrii for pivot positions.
+  @RequiredArgsConstructor
+  public static enum PivotPosition {
+    INTAKE_READY(2.27),
+    ELEVATOR_CLEAR(1.7), // when empty
+    ELEVATOR_CLEAR_WITH_ALGA(0.6),
+    DEALGAEFY(1.5),
+    L1(0.0),
+    L2(1.79),
+    L3(1.79),
+    L4(1.86),
+    REEF_ALGA_L2(-.5),
+    REEF_ALGA_L3(-.5),
+    BARGE_START(0.95),
+    BARGE_END(1.43),
+    PROCESSOR(-0.87),
+    FULLY_OUT(-1),
+    TUNABLE(Double.NaN); // Special value for tunable position
+    private final double position;
+
+    public double getAsDouble() {
+      return position;
+    }
+
+    @Override
+    public String toString() {
+      return name() + " (" + ")";
+    }
   }
 
   /** An enum to represent all desired field poses of the robot. */
