@@ -38,6 +38,26 @@ public final class Constants {
   private static final double leftOfTag = -Units.inchesToMeters(7.15);
   private static final double inFrontOfTagSim = 0.4;
 
+  public static final int elevatorMotor1Id = 31;
+  public static final int elevatorMotor2Id = 32;
+
+  public static final boolean elevatorMotorInverted = false;
+  public static final boolean elevatorMotorFollowerInverted = false;
+  public static final double elevatorMinPosition = 0.0;
+  public static final double elevatorMaxPosition = 1.8;
+  public static final double elevatorKp = 2.85;
+  public static final double elevatorKd = 0.0;
+  public static final double elevatorKff = 1 / 473; // not arbFF, inverse of motor specific Kv value
+  public static final double elevatorKs = 0.58291;
+  public static final double elevatorKg = 0.62411;
+  public static final double elevatorKv = 3.2946;
+  public static final double elevatorKa = 0.62268;
+  public static final double elevatorDistancePerRevolution = Units.inchesToMeters(63) / 52.25;
+  public static final double elevatorVelocityMetersPerSecond = elevatorDistancePerRevolution / 60.0;
+  public static final double elevatorMinSpeed = -0.5; // max speed going down
+  public static final double elevatorMaxSpeed = 0.61; // max speed going up
+  public static final double elevatorPositionTolerance = 0.05;
+
   public static enum Mode {
     /** Running on a real robot. */
     REAL,
@@ -78,6 +98,26 @@ public final class Constants {
     public final double side;
     public final double rotation; // in radians
     public final boolean orientationOnly;
+
+    @RequiredArgsConstructor
+    public static enum ElevatorPosition {
+      DOWN(0.0),
+      L1(0.0),
+      L2(0.31),
+      L3(0.82),
+      L4(1.58),
+      REEF_ALGA_L2(0.6),
+      REEF_ALGA_L3(0.95),
+      BARGE(1.79),
+      PROCESSOR(0.0),
+      TUNABLE(Double.NaN); // Special value for tunable position
+
+      private final double position;
+
+      public double getPosition() {
+        return position;
+      }
+    }
 
     public int getTagID() {
       return DriverStation.getAlliance().get() == Alliance.Red ? tagRedId : tagBlueId;
