@@ -57,6 +57,29 @@ public final class Constants {
   public static final double elevatorMinSpeed = -0.5; // max speed going down
   public static final double elevatorMaxSpeed = 0.61; // max speed going up
   public static final double elevatorPositionTolerance = 0.05;
+  public static final int pivotMotorId = 56;
+  public static final double pivotKff = 1 / 473; // not arbFF, inverse of motor specific Kv value
+  public static final double pivotKs = 0.29184;
+  public static final double pivotKg = 0.37151;
+  public static final double pivotKv = 1.6051;
+  public static final double pivotKa = 0;
+  public static final double pivotOffsetFromHorizontal = -2.899 + Math.PI / 2;
+  public static final boolean pivotMotorInverted = true;
+  public static final double pivotMaxPosition = 2.28;
+  public static final double pivotMinPosition = -1;
+  public static final double pivotAbsoluteEncoderRadiansPerRevolution =
+      Units.degreesToRadians(90) / 0.25;
+  public static final double pivotAbsoluteEncoderAngularVelocityRadiansPerSecond =
+      pivotAbsoluteEncoderRadiansPerRevolution / 60.0;
+  public static final double pivotRelativeEncoderRadiansPerRevolution =
+      Units.degreesToRadians(90) / 8.0;
+  public static final double pivotRelativeEncoderAngularVelocityRadiansPerSecond =
+      pivotRelativeEncoderRadiansPerRevolution / 60.0;
+  public static final double pivotKp = 0.36;
+  public static final double pivotKd = 0.07;
+  public static final double pivotMaxSpeed = 0.18; // max speed going into the bot
+  public static final double pivotMinSpeed = -0.17; // max speed leaving bot
+  public static final double pivotPositionTolerance = 0.01;
 
   public static enum Mode {
     /** Running on a real robot. */
