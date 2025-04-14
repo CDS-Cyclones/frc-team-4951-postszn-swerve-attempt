@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -29,6 +30,8 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.drive.simulation.GyroIOSim;
 import frc.robot.subsystems.drive.simulation.ModuleIOSim;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -51,14 +54,18 @@ public class RobotContainer {
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
   public final GenericHID m_operatorBoard = new GenericHID(1);
+  public final XboxController m_ElevatorPivotControl = new XboxController(2);
   private final Vision visionSim;
   private final Vision vision;
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+  private final Elevator elevator;
+private final Pivot pivot;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     switch (Constants.currentMode) {
+
       case REAL:
         // Real robot, instantiate hardware IO implementations
         drive =
@@ -73,6 +80,7 @@ public class RobotContainer {
             new Vision(
                 drive, new VisionIOLimelight(VisionConstants.limeLightName, drive::getRotation));
         visionSim = new Vision(drive);
+        elevator = new Elevator();
         break;
 
       case SIM:
@@ -106,7 +114,7 @@ public class RobotContainer {
                     driveSimulation::getSimulatedDriveTrainPose));
 
         vision = new Vision(drive);
-
+        elevator = new Elevator();
         break;
 
       default:
@@ -130,10 +138,10 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive, new VisionIOLimelight(VisionConstants.limeLightName, drive::getRotation));
-
+                elevator = new Elevator();
         break;
     }
-
+    pivot = new Pivot();
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -206,7 +214,6 @@ public class RobotContainer {
                 drive.resetOdometry(
                     new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
     controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-
     switch (Constants.currentMode) {
         // ************************************************************************************************************************
         // ************************************************************************************************************************
@@ -329,6 +336,31 @@ public class RobotContainer {
         // ************************************************************************************************************************
         // ************************************************************************************************************************
       case REAL:
+
+        // ELEVATOR AND PIVOT CONTROL
+        new JoystickButton(m_ElevatorPivotControl, Button.kY.value)
+        .whileTrue(Commands.run(() -> elevator.setSpeed(0.22), elevator).onlyIf(pivot::isOutOfElevatorWay))
+        .onFalse(Commands.runOnce(elevator::stop, elevator));
+        new JoystickButton(m_ElevatorPivotControl, Button.kA.value)
+        .whileTrue(Commands.run(() -> elevator.setSpeed(-0.18), elevator).onlyIf(pivot::isOutOfElevatorWay))
+        .onFalse(Commands.runOnce(elevator::stop, elevator));
+        new JoystickButton(m_ElevatorPivotControl, Button.kB.value)
+        .whileTrue(Commands.run(() -> pivot.setSpeed(0.1), pivot))
+        .onFalse(Commands.runOnce(pivot::stop, pivot));
+        new JoystickButton(m_ElevatorPivotControl, Button.kX.value)
+        .whileTrue(Commands.run(() -> pivot.setSpeed(-0.1), pivot))
+        .onFalse(Commands.runOnce(pivot::stop, pivot));
+/* manipulator stuff that hasnt been added yet
+ *     new JoystickButton(OI.m_mainpulatorControllerManual, Button.kRightBumper.value)
+      .whileTrue(Commands.run(() -> intake.setSpeed(OI.m_mainpulatorControllerManual.getRawButton(Button.kStart.value) ? 1 : 0.5), intake))
+      .onFalse(Commands.runOnce(intake::stop, intake));
+    new JoystickButton(OI.m_mainpulatorControllerManual, Button.kLeftBumper.value)
+      .whileTrue(Commands.run(() -> intake.setSpeed(OI.m_mainpulatorControllerManual.getRawButton(Button.kStart.value) ? -1 : -0.5), intake))
+      .onFalse(Commands.runOnce(intake::stop, intake));
+    ///////////////////////////////////////////////////////////
+ */
+
+ 
         // Button 1 -> FieldPose.A
         controller
             .leftBumper()

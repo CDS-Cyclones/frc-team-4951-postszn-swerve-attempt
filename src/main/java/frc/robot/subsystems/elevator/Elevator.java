@@ -21,10 +21,13 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldPose.ElevatorPosition;
+import frc.robot.subsystems.pivot.Pivot;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase implements ElevatorIO {
@@ -153,18 +156,19 @@ public class Elevator extends SubsystemBase implements ElevatorIO {
     return isAtPosition(getPosition());
   }
 
-  // TODO: Implement Pivot so that i can actually use this. or else bad things happen and i burn
-  // another 2 neos.
-  // public Command moveToPosition(Pivot pivot, Supplier<ElevatorPosition> position) {
-  // return Commands.sequence(
-  //   Commands.runOnce(() -> {
-  //     double targetPosition = getPosition();
+  public Command moveToPosition(Pivot pivot, Supplier<ElevatorPosition> position) {
+    return Commands.sequence(
+        Commands.runOnce(
+                () -> {
+                  double targetPosition = getPosition();
 
-  //     setReference(targetPosition);
-  //   }, this)
-  //   .onlyIf(pivot::isOutOfElevatorWay),
-  //   Commands.waitUntil(() -> isAtPosition(position.get()))
-  // );};
+                  setReference(targetPosition);
+                },
+                this)
+            .onlyIf(pivot::isOutOfElevatorWay),
+        Commands.waitUntil(() -> isAtPosition(position.get())));
+  }
+  ;
 
   public void logMotors(SysIdRoutineLog log) {
     log.motor("elevator-motor-1")
