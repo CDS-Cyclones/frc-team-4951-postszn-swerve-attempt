@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
-import frc.robot.Constants.FieldPose.ElevatorPosition;
+import frc.robot.Constants.ElevatorPosition;
 import frc.robot.subsystems.pivot.Pivot;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;

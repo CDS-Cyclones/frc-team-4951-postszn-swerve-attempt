@@ -358,12 +358,22 @@ public class RobotContainer {
         new JoystickButton(m_ElevatorPivotControl, Button.kX.value)
             .whileTrue(Commands.run(() -> pivot.setSpeed(-0.1), pivot))
             .onFalse(Commands.runOnce(pivot::stop, pivot));
-            new JoystickButton(m_ElevatorPivotControl, Button.kRightBumper.value)
-             .whileTrue(Commands.run(() -> intake.setSpeed(m_ElevatorPivotControl.getRawButton(Button.kStart.value) ? 1 : 0.5), intake))
-             .onFalse(Commands.runOnce(intake::stop, intake));
-           new JoystickButton(m_ElevatorPivotControl, Button.kLeftBumper.value)
-             .whileTrue(Commands.run(() -> intake.setSpeed(m_ElevatorPivotControl.getRawButton(Button.kStart.value) ? -1 : -0.5), intake))
-             .onFalse(Commands.runOnce(intake::stop, intake));
+        new JoystickButton(m_ElevatorPivotControl, Button.kRightBumper.value)
+            .whileTrue(
+                Commands.run(
+                    () ->
+                        intake.setSpeed(
+                            m_ElevatorPivotControl.getRawButton(Button.kStart.value) ? 1 : 0.5),
+                    intake))
+            .onFalse(Commands.runOnce(intake::stop, intake));
+        new JoystickButton(m_ElevatorPivotControl, Button.kLeftBumper.value)
+            .whileTrue(
+                Commands.run(
+                    () ->
+                        intake.setSpeed(
+                            m_ElevatorPivotControl.getRawButton(Button.kStart.value) ? -1 : -0.5),
+                    intake))
+            .onFalse(Commands.runOnce(intake::stop, intake));
 
         // Button 1 -> FieldPose.A
         controller
