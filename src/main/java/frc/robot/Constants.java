@@ -81,6 +81,9 @@ public final class Constants {
   public static final double pivotMinSpeed = -0.17; // max speed leaving bot
   public static final double pivotPositionTolerance = 0.01;
   public static final double pivotMinPositionToMoveElevator = 2;
+  public static final int intakeMotorId = 57;
+  public static final int coralInflow = 41;
+  public static final int coralOutflow = 41;
 
   public static enum Mode {
     /** Running on a real robot. */

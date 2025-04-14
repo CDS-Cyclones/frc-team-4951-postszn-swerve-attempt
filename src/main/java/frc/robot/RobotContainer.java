@@ -31,6 +31,7 @@ import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.drive.simulation.GyroIOSim;
 import frc.robot.subsystems.drive.simulation.ModuleIOSim;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
@@ -60,12 +61,12 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
   private final Elevator elevator;
-private final Pivot pivot;
+  private final Pivot pivot;
+  private final Intake intake;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     switch (Constants.currentMode) {
-
       case REAL:
         // Real robot, instantiate hardware IO implementations
         drive =
@@ -81,6 +82,7 @@ private final Pivot pivot;
                 drive, new VisionIOLimelight(VisionConstants.limeLightName, drive::getRotation));
         visionSim = new Vision(drive);
         elevator = new Elevator();
+        intake = new Intake();
         break;
 
       case SIM:
@@ -115,6 +117,7 @@ private final Pivot pivot;
 
         vision = new Vision(drive);
         elevator = new Elevator();
+        intake = new Intake();
         break;
 
       default:
@@ -138,7 +141,8 @@ private final Pivot pivot;
         vision =
             new Vision(
                 drive, new VisionIOLimelight(VisionConstants.limeLightName, drive::getRotation));
-                elevator = new Elevator();
+        elevator = new Elevator();
+        intake = new Intake();
         break;
     }
     pivot = new Pivot();
@@ -339,28 +343,28 @@ private final Pivot pivot;
 
         // ELEVATOR AND PIVOT CONTROL
         new JoystickButton(m_ElevatorPivotControl, Button.kY.value)
-        .whileTrue(Commands.run(() -> elevator.setSpeed(0.22), elevator).onlyIf(pivot::isOutOfElevatorWay))
-        .onFalse(Commands.runOnce(elevator::stop, elevator));
+            .whileTrue(
+                Commands.run(() -> elevator.setSpeed(0.22), elevator)
+                    .onlyIf(pivot::isOutOfElevatorWay))
+            .onFalse(Commands.runOnce(elevator::stop, elevator));
         new JoystickButton(m_ElevatorPivotControl, Button.kA.value)
-        .whileTrue(Commands.run(() -> elevator.setSpeed(-0.18), elevator).onlyIf(pivot::isOutOfElevatorWay))
-        .onFalse(Commands.runOnce(elevator::stop, elevator));
+            .whileTrue(
+                Commands.run(() -> elevator.setSpeed(-0.18), elevator)
+                    .onlyIf(pivot::isOutOfElevatorWay))
+            .onFalse(Commands.runOnce(elevator::stop, elevator));
         new JoystickButton(m_ElevatorPivotControl, Button.kB.value)
-        .whileTrue(Commands.run(() -> pivot.setSpeed(0.1), pivot))
-        .onFalse(Commands.runOnce(pivot::stop, pivot));
+            .whileTrue(Commands.run(() -> pivot.setSpeed(0.1), pivot))
+            .onFalse(Commands.runOnce(pivot::stop, pivot));
         new JoystickButton(m_ElevatorPivotControl, Button.kX.value)
-        .whileTrue(Commands.run(() -> pivot.setSpeed(-0.1), pivot))
-        .onFalse(Commands.runOnce(pivot::stop, pivot));
-/* manipulator stuff that hasnt been added yet
- *     new JoystickButton(OI.m_mainpulatorControllerManual, Button.kRightBumper.value)
-      .whileTrue(Commands.run(() -> intake.setSpeed(OI.m_mainpulatorControllerManual.getRawButton(Button.kStart.value) ? 1 : 0.5), intake))
-      .onFalse(Commands.runOnce(intake::stop, intake));
-    new JoystickButton(OI.m_mainpulatorControllerManual, Button.kLeftBumper.value)
-      .whileTrue(Commands.run(() -> intake.setSpeed(OI.m_mainpulatorControllerManual.getRawButton(Button.kStart.value) ? -1 : -0.5), intake))
-      .onFalse(Commands.runOnce(intake::stop, intake));
-    ///////////////////////////////////////////////////////////
- */
+            .whileTrue(Commands.run(() -> pivot.setSpeed(-0.1), pivot))
+            .onFalse(Commands.runOnce(pivot::stop, pivot));
+            new JoystickButton(m_ElevatorPivotControl, Button.kRightBumper.value)
+             .whileTrue(Commands.run(() -> intake.setSpeed(m_ElevatorPivotControl.getRawButton(Button.kStart.value) ? 1 : 0.5), intake))
+             .onFalse(Commands.runOnce(intake::stop, intake));
+           new JoystickButton(m_ElevatorPivotControl, Button.kLeftBumper.value)
+             .whileTrue(Commands.run(() -> intake.setSpeed(m_ElevatorPivotControl.getRawButton(Button.kStart.value) ? -1 : -0.5), intake))
+             .onFalse(Commands.runOnce(intake::stop, intake));
 
- 
         // Button 1 -> FieldPose.A
         controller
             .leftBumper()
