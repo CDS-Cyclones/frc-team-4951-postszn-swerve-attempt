@@ -73,4 +73,13 @@ public class ScoringCommands {
         new WaitCommand(1.5),
         new InstantCommand(() -> intake.setSpeed(0.0)));
   }
+
+  public static Command retractElevatorPivot(
+    Elevator elevator,
+    Pivot pivot){
+        return new SequentialCommandGroup(
+         pivot.moveToPosition(() -> PivotPosition.ELEVATOR_CLEAR),
+         elevator.moveToPosition(pivot, () -> ElevatorPosition.DOWN),
+         pivot.moveToPosition(() -> PivotPosition.INTAKE_READY));
+    }
 }
