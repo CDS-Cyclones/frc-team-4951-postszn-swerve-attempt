@@ -202,10 +202,15 @@ public class RobotContainer {
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
                 () -> new Rotation2d()));
+    // Drive to nearest aprilTag pose
+    controller
+        .leftBumper()
+        .onTrue(
+            Commands.runOnce(
+                () -> DriveCommands.driveToClosestAprilTag(drive, visionSim).schedule(), drive));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
     // Reset gyro to 0° when B button is pressed
     final Runnable resetGyro =
         Constants.currentMode == Constants.Mode.SIM

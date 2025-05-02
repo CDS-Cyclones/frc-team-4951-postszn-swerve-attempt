@@ -35,8 +35,10 @@ import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.vision.Vision;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -402,6 +404,64 @@ public class DriveCommands {
           } else {
             System.out.println(
                 "OP Board button pressed: NOT within " + threshold + " m (" + distance + " m)");
+          }
+        },
+        drive);
+  }
+
+  public static Command driveToClosestAprilTag(Drive drive, Vision vision) {
+    return new InstantCommand(
+        () -> {
+          int[] tagIds;
+          try {
+            // shalom
+            // TODO: add the other button to flick to the other side OP style
+            double[] detectedTags = Arrays.stream(vision.getTagIds(0)).asDoubleStream().toArray();
+            System.out.println("\"AprilTag's Detected\": " + Arrays.toString(detectedTags));
+            
+
+            if (detectedTags.length == 0) {
+              System.out.println("No AprilTags detected.");
+              return;
+            }
+
+            // Convert double values to ints
+            tagIds = new int[detectedTags.length];
+            for (int i = 0; i < detectedTags.length; i++) {
+              tagIds[i] = (int) detectedTags[i];
+            }
+          } catch (Exception e) {
+            System.out.println("Exception while retrieving tag IDs: " + e);
+            return;
+          }
+
+          // Continue processing if tagIds are available.
+          Pose2d currentPose = drive.getPose();
+          FieldPose closestFieldPose = null;
+          double minDistance = Double.POSITIVE_INFINITY;
+
+          for (int tagId : tagIds) {
+            Optional<FieldPose> fpOpt = FieldPose.fromTagId(tagId);
+            if (fpOpt.isPresent()) {
+              FieldPose candidate = fpOpt.get();
+              Pose2d targetPose = candidate.getDesiredPose().toPose2d();
+              double distance =
+                  currentPose.getTranslation().getDistance(targetPose.getTranslation());
+              if (distance < minDistance) {
+                minDistance = distance;
+                closestFieldPose = candidate;
+              }
+            } else {
+              System.out.println("No FieldPose mapping for tagId: " + tagId);
+            }
+          }
+
+          if (closestFieldPose != null) {
+            System.out.println("Driving to nearest AprilTag pose: " + closestFieldPose);
+            final FieldPose target = closestFieldPose; // Make it final for the lambda
+            DriveCommands.DriveToPose(drive, vision, () -> target).schedule();
+          } else {
+            System.out.println("No matching FieldPose for detected tags.");
           }
         },
         drive);

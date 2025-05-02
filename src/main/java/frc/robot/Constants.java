@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.subsystems.vision.VisionConstants;
+import java.util.Arrays;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
@@ -234,6 +236,10 @@ public final class Constants {
     @Override
     public String toString() {
       return name();
+    }
+
+    public static Optional<FieldPose> fromTagId(int tagId) {
+      return Arrays.stream(values()).filter(fp -> fp.getTagID() == tagId).findFirst();
     }
   }
 
