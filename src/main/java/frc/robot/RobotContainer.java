@@ -14,6 +14,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -67,6 +68,9 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    pivot = new Pivot();
+    elevator = new Elevator();
+    intake = new Intake();
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -82,8 +86,7 @@ public class RobotContainer {
             new Vision(
                 drive, new VisionIOLimelight(VisionConstants.limeLightName, drive::getRotation));
         visionSim = new Vision(drive);
-        elevator = new Elevator();
-        intake = new Intake();
+        registerNamedCommands();
         break;
 
       case SIM:
@@ -117,8 +120,7 @@ public class RobotContainer {
                     driveSimulation::getSimulatedDriveTrainPose));
 
         vision = new Vision(drive);
-        elevator = new Elevator();
-        intake = new Intake();
+        registerNamedCommands();
         break;
 
       default:
@@ -142,11 +144,9 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive, new VisionIOLimelight(VisionConstants.limeLightName, drive::getRotation));
-        elevator = new Elevator();
-        intake = new Intake();
+        registerNamedCommands();
         break;
     }
-    pivot = new Pivot();
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -168,6 +168,23 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+  }
+
+  private void registerNamedCommands() {
+    NamedCommands.registerCommand(
+        "score_l4", ScoringCommands.scoreL4(drive, vision, elevator, pivot, intake));
+    NamedCommands.registerCommand(
+        "score_l3", ScoringCommands.scoreL3(drive, vision, elevator, pivot, intake));
+    NamedCommands.registerCommand(
+        "score_l2", ScoringCommands.scoreL2(drive, vision, elevator, pivot, intake));
+    NamedCommands.registerCommand(
+        "align_to_K", DriveCommands.DriveToPose(drive, vision, () -> FieldPose.K));
+    NamedCommands.registerCommand(
+        "align_to_J", DriveCommands.DriveToPose(drive, vision, () -> FieldPose.D));
+    NamedCommands.registerCommand(
+        "align_to_I", DriveCommands.DriveToPose(drive, vision, () -> FieldPose.E));
+    NamedCommands.registerCommand(
+        "intake_from_station", ScoringCommands.intakeCoralFromStation(intake));
   }
 
   /**

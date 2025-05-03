@@ -28,6 +28,13 @@ public class ScoringCommands {
         new InstantCommand(() -> retractElevatorPivot(elevator, pivot)));
   }
 
+  public static Command intakeCoralFromStation(Intake intake) {
+    return new SequentialCommandGroup(
+        new InstantCommand(() -> intake.setSpeed(IntakeAction.INTAKE_CORAL.getSpeed())),
+        new WaitUntilCommand(() -> intake.coralDetectedAtOutflow()),
+        new InstantCommand(() -> intake.setSpeed(0.0)));
+  }
+
   public static Command scoreL3(
       Drive drive, Vision vision, Elevator elevator, Pivot pivot, Intake intake) {
     return new SequentialCommandGroup(
