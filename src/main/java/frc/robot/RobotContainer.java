@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.FieldPose;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.ScoringCommands;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.drive.simulation.GyroIOSim;
 import frc.robot.subsystems.drive.simulation.ModuleIOSim;
@@ -184,38 +185,74 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // // Drive in half-speed when right bumper is held
-    // controller
-    //     .rightBumper()
-    //     .whileTrue(
-    //         DriveCommands.joystickDrive(
-    //             drive,
-    //             () -> -controller.getLeftY() * 0.5,
-    //             () -> -controller.getLeftX() * 0.5,
-    //             () -> -controller.getRightX() * 0.5));
     // Lock to 0° when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
-    // Drive to nearest aprilTag LEFT side pose
-    controller
-        .leftBumper()
-        .onTrue(
-            Commands.runOnce(
-                () -> DriveCommands.driveToClosestAprilTag(drive, visionSim, true).schedule(),
-                drive));
-    // Drive to nearest aprilTag RIGHT side pose
-    controller
-        .rightBumper()
-        .onTrue(
-            Commands.runOnce(
-                () -> DriveCommands.driveToClosestAprilTag(drive, visionSim, false).schedule(),
-                drive));
+    // controller
+    //     .a()
+    //     .whileTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -controller.getLeftY(),
+    //             () -> -controller.getLeftX(),
+    //             () -> new Rotation2d()));
+
+    switch (Constants.currentMode) {
+      case SIM:
+        // Drive to nearest aprilTag LEFT side pose
+        controller
+            .leftBumper()
+            .onTrue(
+                Commands.runOnce(
+                    () -> DriveCommands.driveToClosestAprilTag(drive, visionSim, true).schedule(),
+                    drive));
+        // Drive to nearest aprilTag RIGHT side pose
+        controller
+            .rightBumper()
+            .onTrue(
+                Commands.runOnce(
+                    () ->
+                        DriveCommands.driveToClosestAprilTag(drive, visionSim, false).schedule()));
+        // Score L2 when A button is pressed
+        controller.a().onTrue(Commands.runOnce(() -> System.out.println("SCORING L2 SIM")));
+        // Score L3 when B button is pressed
+        controller.b().onTrue(Commands.runOnce(() -> System.out.println("SCORING L3 SIM")));
+        // Score L4 when Y button is pressed
+        controller.y().onTrue(Commands.runOnce(() -> System.out.println("SCORING L4 SIM")));
+
+        break;
+      case REAL:
+        controller
+            .leftBumper()
+            .onTrue(
+                Commands.runOnce(
+                    () -> DriveCommands.driveToClosestAprilTag(drive, vision, true).schedule(),
+                    drive));
+        // Drive to nearest aprilTag RIGHT side pose
+        controller
+            .rightBumper()
+            .onTrue(
+                Commands.runOnce(
+                    () -> DriveCommands.driveToClosestAprilTag(drive, vision, false).schedule(),
+                    drive));
+
+        // Score L2 when A button is pressed
+        controller
+            .a()
+            .onTrue(
+                Commands.runOnce(
+                    () -> ScoringCommands.scoreL2(drive, vision, elevator, pivot, intake)));
+        // Score L3 when B button is pressed
+        controller
+            .b()
+            .onTrue(
+                Commands.runOnce(
+                    () -> ScoringCommands.scoreL3(drive, vision, elevator, pivot, intake)));
+        // Score L4 when Y button is pressed
+        controller
+            .y()
+            .onTrue(
+                Commands.runOnce(
+                    () -> ScoringCommands.scoreL4(drive, vision, elevator, pivot, intake)));
+    }
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
