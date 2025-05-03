@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.Constants;
 import frc.robot.Constants.FieldPose;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -409,23 +410,19 @@ public class DriveCommands {
         drive);
   }
 
-  public static Command driveToClosestAprilTag(Drive drive, Vision vision) {
+  public static Command driveToClosestAprilTag(Drive drive, Vision vision, boolean useLeft) {
     return new InstantCommand(
         () -> {
           int[] tagIds;
           try {
-            // shalom
-            // TODO: add the other button to flick to the other side OP style
+            // Retrieve detected tag IDs as a double array.
             double[] detectedTags = Arrays.stream(vision.getTagIds(0)).asDoubleStream().toArray();
             System.out.println("\"AprilTag's Detected\": " + Arrays.toString(detectedTags));
-            
-
             if (detectedTags.length == 0) {
               System.out.println("No AprilTags detected.");
               return;
             }
-
-            // Convert double values to ints
+            // Convert the doubles to ints.
             tagIds = new int[detectedTags.length];
             for (int i = 0; i < detectedTags.length; i++) {
               tagIds[i] = (int) detectedTags[i];
@@ -435,13 +432,21 @@ public class DriveCommands {
             return;
           }
 
-          // Continue processing if tagIds are available.
+          // Use the robot's current pose.
           Pose2d currentPose = drive.getPose();
           FieldPose closestFieldPose = null;
           double minDistance = Double.POSITIVE_INFINITY;
 
+          // For each detected tag, consider only FieldPoses whose side matches the desired one.
           for (int tagId : tagIds) {
-            Optional<FieldPose> fpOpt = FieldPose.fromTagId(tagId);
+            Optional<FieldPose> fpOpt =
+                Arrays.stream(FieldPose.values())
+                    .filter(
+                        fp ->
+                            (fp.tagBlueId == tagId || fp.tagRedId == tagId)
+                                && fp.side
+                                    == (useLeft ? Constants.leftOfTag : Constants.rightOfTag))
+                    .findFirst();
             if (fpOpt.isPresent()) {
               FieldPose candidate = fpOpt.get();
               Pose2d targetPose = candidate.getDesiredPose().toPose2d();
@@ -452,13 +457,21 @@ public class DriveCommands {
                 closestFieldPose = candidate;
               }
             } else {
-              System.out.println("No FieldPose mapping for tagId: " + tagId);
+              System.out.println(
+                  "No FieldPose mapping for tagId: "
+                      + tagId
+                      + " with side "
+                      + (useLeft ? "left" : "right"));
             }
           }
 
           if (closestFieldPose != null) {
-            System.out.println("Driving to nearest AprilTag pose: " + closestFieldPose);
-            final FieldPose target = closestFieldPose; // Make it final for the lambda
+            System.out.println(
+                "Driving to nearest "
+                    + (useLeft ? "left" : "right")
+                    + " AprilTag pose: "
+                    + closestFieldPose);
+            final FieldPose target = closestFieldPose; // Final for lambda use.
             DriveCommands.DriveToPose(drive, vision, () -> target).schedule();
           } else {
             System.out.println("No matching FieldPose for detected tags.");

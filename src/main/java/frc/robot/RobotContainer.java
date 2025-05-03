@@ -184,15 +184,15 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Drive in half-speed when right bumper is held
-    controller
-        .rightBumper()
-        .whileTrue(
-            DriveCommands.joystickDrive(
-                drive,
-                () -> -controller.getLeftY() * 0.5,
-                () -> -controller.getLeftX() * 0.5,
-                () -> -controller.getRightX() * 0.5));
+    // // Drive in half-speed when right bumper is held
+    // controller
+    //     .rightBumper()
+    //     .whileTrue(
+    //         DriveCommands.joystickDrive(
+    //             drive,
+    //             () -> -controller.getLeftY() * 0.5,
+    //             () -> -controller.getLeftX() * 0.5,
+    //             () -> -controller.getRightX() * 0.5));
     // Lock to 0° when A button is held
     controller
         .a()
@@ -202,12 +202,20 @@ public class RobotContainer {
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
                 () -> new Rotation2d()));
-    // Drive to nearest aprilTag pose
+    // Drive to nearest aprilTag LEFT side pose
     controller
         .leftBumper()
         .onTrue(
             Commands.runOnce(
-                () -> DriveCommands.driveToClosestAprilTag(drive, visionSim).schedule(), drive));
+                () -> DriveCommands.driveToClosestAprilTag(drive, visionSim, true).schedule(),
+                drive));
+    // Drive to nearest aprilTag RIGHT side pose
+    controller
+        .rightBumper()
+        .onTrue(
+            Commands.runOnce(
+                () -> DriveCommands.driveToClosestAprilTag(drive, visionSim, false).schedule(),
+                drive));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));

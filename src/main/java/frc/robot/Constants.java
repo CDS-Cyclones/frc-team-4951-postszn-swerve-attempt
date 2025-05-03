@@ -37,9 +37,9 @@ public final class Constants {
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
   private static final double inFrontOfTag = Units.inchesToMeters(23);
-  private static final double rightOfTag = Units.inchesToMeters(6.6);
-  private static final double leftOfTag = -Units.inchesToMeters(7.15);
-  private static final double inFrontOfTagSim = 0.4;
+  public static final double rightOfTag = Units.inchesToMeters(6.6);
+  public static final double leftOfTag = -Units.inchesToMeters(7.15);
+  private static final double inFrontOfTagSim = 0.1;
 
   public static final int elevatorMotor1Id = 31;
   public static final int elevatorMotor2Id = 32;
