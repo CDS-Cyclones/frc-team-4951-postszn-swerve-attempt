@@ -64,4 +64,20 @@ public class ScoringCommands {
         elevator.moveToPosition(pivot, () -> ElevatorPosition.DOWN),
         pivot.moveToPosition(() -> PivotPosition.INTAKE_READY));
   }
+
+  // TODO : Finish Alga Commands
+
+//   public static Command deAlgafyL2(Drive drive, Vision vision, Elevator elevator, Pivot pivot, Intake intake){
+//   return new SequentialCommandGroup(
+//         pivot.moveToPosition(() -> PivotPosition.ELEVATOR_CLEAR),
+//         elevator.moveToPosition(pivot, () -> ElevatorPosition.REEF_ALGA_L2), 
+//         pivot.moveToPosition(() -> PivotPosition.REEF_ALGA_L2),
+
+
+
+
+
+// );
+
+//   }
 }
