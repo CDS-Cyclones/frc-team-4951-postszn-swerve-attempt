@@ -479,4 +479,65 @@ public class DriveCommands {
         },
         drive);
   }
+
+  public static Command driveToClosestAlgaFieldPose(Drive drive, Vision vision) {
+    return new InstantCommand(
+        () -> {
+          int[] tagIds;
+          try {
+            // Retrieve detected tag IDs as a double array.
+            double[] detectedTags = Arrays.stream(vision.getTagIds(0)).asDoubleStream().toArray();
+            System.out.println("\"AprilTag's Detected\": " + Arrays.toString(detectedTags));
+            if (detectedTags.length == 0) {
+              System.out.println("No AprilTags detected.");
+              return;
+            }
+            // Convert the doubles to ints.
+            tagIds = new int[detectedTags.length];
+            for (int i = 0; i < detectedTags.length; i++) {
+              tagIds[i] = (int) detectedTags[i];
+            }
+          } catch (Exception e) {
+            System.out.println("Exception while retrieving tag IDs: " + e);
+            return;
+          }
+
+          // Use the robot's current pose.
+          Pose2d currentPose = drive.getPose();
+          FieldPose closestFieldPose = null;
+          double minDistance = Double.POSITIVE_INFINITY;
+
+          // For each detected tag, consider only FieldPoses named "Z1" through "Z6".
+          for (int tagId : tagIds) {
+            Optional<FieldPose> fpOpt =
+                Arrays.stream(FieldPose.values())
+                    .filter(
+                        fp ->
+                            fp.name().startsWith("Z")
+                                && (fp.tagBlueId == tagId || fp.tagRedId == tagId))
+                    .findFirst();
+            if (fpOpt.isPresent()) {
+              FieldPose candidate = fpOpt.get();
+              Pose2d targetPose = candidate.getDesiredPose().toPose2d();
+              double distance =
+                  currentPose.getTranslation().getDistance(targetPose.getTranslation());
+              if (distance < minDistance) {
+                minDistance = distance;
+                closestFieldPose = candidate;
+              }
+            } else {
+              System.out.println("No Z FieldPose mapping for tagId: " + tagId);
+            }
+          }
+
+          if (closestFieldPose != null) {
+            System.out.println("Driving to nearest Z FieldPose: " + closestFieldPose);
+            final FieldPose target = closestFieldPose; // Final for lambda use.
+            DriveCommands.DriveToPose(drive, vision, () -> target).schedule();
+          } else {
+            System.out.println("No matching Z FieldPose for detected tags.");
+          }
+        },
+        drive);
+  }
 }

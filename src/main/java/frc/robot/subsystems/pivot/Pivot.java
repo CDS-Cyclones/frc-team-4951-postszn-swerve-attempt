@@ -123,6 +123,10 @@ public class Pivot extends SubsystemBase implements PivotIO {
     return Math.abs(getPosition() - position) < Constants.elevatorPositionTolerance;
   }
 
+  public boolean isAtPosition(PivotPosition position) {
+    return isAtPosition(position.getAsDouble());
+  }
+
   public Command moveToPosition(Supplier<PivotPosition> position) {
     return Commands.sequence(
         Commands.runOnce(

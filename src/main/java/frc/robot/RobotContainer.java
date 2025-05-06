@@ -228,6 +228,13 @@ public class RobotContainer {
                 Commands.runOnce(
                     () ->
                         DriveCommands.driveToClosestAprilTag(drive, visionSim, false).schedule()));
+        // Drive to nearest alga field pose
+        controller
+            .x()
+            .onTrue(
+                Commands.runOnce(
+                    () -> DriveCommands.driveToClosestAlgaFieldPose(drive, visionSim).schedule()));
+
         // Score L2 when A button is pressed
         controller.a().onTrue(Commands.runOnce(() -> System.out.println("SCORING L2 SIM")));
         // Score L3 when B button is pressed
@@ -251,6 +258,12 @@ public class RobotContainer {
                     () -> DriveCommands.driveToClosestAprilTag(drive, vision, false).schedule(),
                     drive));
 
+        controller
+            .x()
+            .onTrue(
+                Commands.runOnce(
+                    () -> DriveCommands.driveToClosestAlgaFieldPose(drive, vision).schedule()));
+
         // Score L2 when A button is pressed
         controller
             .a()
@@ -271,8 +284,6 @@ public class RobotContainer {
                     () -> ScoringCommands.scoreL4(drive, vision, elevator, pivot, intake)));
     }
 
-    // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     // Reset gyro to 0° when B button is pressed
     final Runnable resetGyro =
         Constants.currentMode == Constants.Mode.SIM
@@ -294,8 +305,7 @@ public class RobotContainer {
       case SIM:
         // Button 1 -> FieldPose.A
         controller
-            .leftBumper()
-            .and(new JoystickButton(m_operatorBoard, 1))
+            .x()
             .onTrue(
                 DriveCommands.driveToPoseIfClose(
                     drive, visionSim, () -> FieldPose.A, DriveConstants.DriveToPoseThreshold));
