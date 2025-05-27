@@ -52,7 +52,7 @@ public class ScoringCommands {
                 Commands.runOnce(() -> retractElevatorPivot(elevator, pivot))))
         .onlyIf(pivot::isOutOfElevatorWay);
   }
-  }
+  
 
   public static Command scoreL2(
       Drive drive, Vision vision, Elevator elevator, Pivot pivot, Intake intake) {
