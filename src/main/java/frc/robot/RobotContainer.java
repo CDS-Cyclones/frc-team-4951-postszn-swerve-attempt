@@ -180,11 +180,10 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "align_to_K", DriveCommands.DriveToPose(drive, vision, () -> FieldPose.K));
     NamedCommands.registerCommand(
-        "align_to_J", DriveCommands.DriveToPose(drive, vision, () -> FieldPose.D));
+        "align_to_J", DriveCommands.DriveToPose(drive, vision, () -> FieldPose.J));
     NamedCommands.registerCommand(
         "align_to_I", DriveCommands.DriveToPose(drive, vision, () -> FieldPose.E));
-    NamedCommands.registerCommand(
-        "intake_from_station", ScoringCommands.intakeCoralFromStation(intake));
+    NamedCommands.registerCommand("intake_from_station", ScoringCommands.intakeFromStation(intake));
   }
 
   /**
@@ -241,8 +240,10 @@ public class RobotContainer {
         controller.b().onTrue(Commands.runOnce(() -> System.out.println("SCORING L3 SIM")));
         // Score L4 when Y button is pressed
         controller.y().onTrue(Commands.runOnce(() -> System.out.println("SCORING L4 SIM")));
-
+        controller.start().onTrue(Commands.runOnce(() -> System.out.println("INTAKING SIM")));
         break;
+
+        // REAL ROBOT
       case REAL:
         controller
             .leftBumper()
@@ -282,6 +283,10 @@ public class RobotContainer {
             .onTrue(
                 Commands.runOnce(
                     () -> ScoringCommands.scoreL4(drive, vision, elevator, pivot, intake)));
+        controller
+            .start()
+            .onTrue(Commands.runOnce(() -> ScoringCommands.intakeFromStation(intake)));
+        break;
     }
 
     // Reset gyro to 0° when B button is pressed
@@ -295,7 +300,7 @@ public class RobotContainer {
             : () ->
                 drive.resetOdometry(
                     new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
-    controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+    // controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
     switch (Constants.currentMode) {
         // ************************************************************************************************************************
         // ************************************************************************************************************************
@@ -305,7 +310,8 @@ public class RobotContainer {
       case SIM:
         // Button 1 -> FieldPose.A
         controller
-            .x()
+            .leftBumper()
+            .and(new JoystickButton(m_operatorBoard, 1))
             .onTrue(
                 DriveCommands.driveToPoseIfClose(
                     drive, visionSim, () -> FieldPose.A, DriveConstants.DriveToPoseThreshold));

@@ -22,71 +22,60 @@ public class ScoringCommands {
   public static Command scoreL4(
       Drive drive, Vision vision, Elevator elevator, Pivot pivot, Intake intake) {
     return new SequentialCommandGroup(
-        // Step 1: Move pivot to the ELEVATOR_CLEAR position.
-        pivot.moveToPosition(() -> PivotPosition.ELEVATOR_CLEAR),
-        // Step 2: Only if the pivot is out of the elevator way, execute the scoring L4 sequence.
-        new ConditionalCommand(
-            // If condition is true:
+            // Step 1: Move pivot to ELEVATOR_CLEAR.
+            pivot.moveToPosition(() -> PivotPosition.ELEVATOR_CLEAR),
+            // Step 2: If pivot is clear, run the scoreL2 sequence; otherwise do nothing.
+            // If the condition is true:
             new SequentialCommandGroup(
                 elevator.moveToPosition(pivot, () -> ElevatorPosition.L4),
-                pivot.moveToPosition(() -> PivotPosition.L4),
-                new InstantCommand(() -> intake.setSpeed(IntakeAction.SCORE_L4.getSpeed())),
+                pivot.moveToPosition(() -> PivotPosition.L2),
+                Commands.runOnce(()-> intake.setSpeed(IntakeAction.SCORE_L4.getSpeed())),
                 new WaitUntilCommand(() -> !intake.coralDetectedAtOutflow()),
-                new InstantCommand(() -> intake.setSpeed(0.0)),
-                new InstantCommand(() -> retractElevatorPivot(elevator, pivot))),
-            // If condition is false:
-            Commands.none(),
-            // Condition: pivot must be out of the elevator way.
-            pivot::isOutOfElevatorWay));
-  }
-
-  public static Command intakeCoralFromStation(Intake intake) {
-    return new SequentialCommandGroup(
-        new InstantCommand(() -> intake.setSpeed(IntakeAction.INTAKE_CORAL.getSpeed())),
-        new WaitUntilCommand(() -> intake.coralDetectedAtOutflow()),
-        new InstantCommand(() -> intake.setSpeed(0.0)));
+                Commands.runOnce((() -> intake.setSpeed(0.0))),
+                Commands.runOnce(() -> retractElevatorPivot(elevator, pivot))))
+        .onlyIf(pivot::isOutOfElevatorWay);
   }
 
   public static Command scoreL3(
       Drive drive, Vision vision, Elevator elevator, Pivot pivot, Intake intake) {
     return new SequentialCommandGroup(
-        // Step 1: Move pivot to ELEVATOR_CLEAR.
-        pivot.moveToPosition(() -> PivotPosition.ELEVATOR_CLEAR),
-        // Step 2: Only if pivot is clear, perform the rest of scoring L3.
-        new ConditionalCommand(
-            // If condition is true, run this sequence.
+            // Step 1: Move pivot to ELEVATOR_CLEAR.
+            pivot.moveToPosition(() -> PivotPosition.ELEVATOR_CLEAR),
+            // Step 2: If pivot is clear, run the scoreL2 sequence; otherwise do nothing.
+            // If the condition is true:
             new SequentialCommandGroup(
                 elevator.moveToPosition(pivot, () -> ElevatorPosition.L3),
                 pivot.moveToPosition(() -> PivotPosition.L3),
-                new InstantCommand(() -> intake.setSpeed(IntakeAction.SCORE_L3.getSpeed())),
+                Commands.runOnce(()-> intake.setSpeed(IntakeAction.SCORE_L3.getSpeed())),
                 new WaitUntilCommand(() -> !intake.coralDetectedAtOutflow()),
-                new InstantCommand(() -> intake.setSpeed(0.0)),
-                new InstantCommand(() -> retractElevatorPivot(elevator, pivot))),
-            // If condition is false, do nothing.
-            Commands.none(),
-            // Condition: pivot must be out of the elevator way.
-            pivot::isOutOfElevatorWay));
+                Commands.runOnce((() -> intake.setSpeed(0.0))),
+                Commands.runOnce(() -> retractElevatorPivot(elevator, pivot))))
+        .onlyIf(pivot::isOutOfElevatorWay);
+  }
   }
 
   public static Command scoreL2(
       Drive drive, Vision vision, Elevator elevator, Pivot pivot, Intake intake) {
     return new SequentialCommandGroup(
-        // Step 1: Move pivot to ELEVATOR_CLEAR.
-        pivot.moveToPosition(() -> PivotPosition.ELEVATOR_CLEAR),
-        // Step 2: If pivot is clear, run the scoreL2 sequence; otherwise do nothing.
-        new ConditionalCommand(
+            // Step 1: Move pivot to ELEVATOR_CLEAR.
+            pivot.moveToPosition(() -> PivotPosition.ELEVATOR_CLEAR),
+            // Step 2: If pivot is clear, run the scoreL2 sequence; otherwise do nothing.
             // If the condition is true:
             new SequentialCommandGroup(
                 elevator.moveToPosition(pivot, () -> ElevatorPosition.L2),
                 pivot.moveToPosition(() -> PivotPosition.L2),
-                new InstantCommand(() -> intake.setSpeed(IntakeAction.SCORE_L2.getSpeed())),
+                Commands.runOnce(()-> intake.setSpeed(IntakeAction.SCORE_L2.getSpeed())),
                 new WaitUntilCommand(() -> !intake.coralDetectedAtOutflow()),
-                new InstantCommand(() -> intake.setSpeed(0.0)),
-                new InstantCommand(() -> retractElevatorPivot(elevator, pivot))),
-            // If false, run nothing.
-            Commands.none(),
-            // Condition: only proceed if the pivot is out of the elevator way.
-            pivot::isOutOfElevatorWay));
+                Commands.runOnce((() -> intake.setSpeed(0.0))),
+                Commands.runOnce(() -> retractElevatorPivot(elevator, pivot))))
+        .onlyIf(pivot::isOutOfElevatorWay);
+  }
+
+  public static Command intakeFromStation(Intake intake) {
+    return new SequentialCommandGroup(
+        new InstantCommand(() -> intake.setSpeed(IntakeAction.INTAKE_CORAL.getSpeed())),
+        new WaitUntilCommand(() -> intake.coralDetectedAtOutflow()),
+        new InstantCommand(() -> intake.setSpeed(0.0)));
   }
 
   public static Command retractElevatorPivot(Elevator elevator, Pivot pivot) {

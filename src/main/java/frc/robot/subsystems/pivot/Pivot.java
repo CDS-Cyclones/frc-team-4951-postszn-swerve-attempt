@@ -18,6 +18,7 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -88,6 +89,7 @@ public class Pivot extends SubsystemBase implements PivotIO {
   public void periodic() {
     relative.setPosition(absolute.getPosition() + Constants.pivotOffsetFromHorizontal);
     updateInputs(pivotInputs);
+    SmartDashboard.putNumber("Pivot Position", getPosition());
   }
 
   public void setSpeed(double speed) {
